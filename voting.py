@@ -14,7 +14,7 @@ def generatePerferences(values):
 
     return dict
 
-
+# completed
 def dictatorship(preferenceProfile, agent):
     print("dictatorship")
     print(preferenceProfile)
@@ -23,17 +23,25 @@ def dictatorship(preferenceProfile, agent):
 
     # 一个agent 决定一切，他的选择的第一个就是结果
     # 传进来的可能就不是排过序的，那就先
-    values = generatePerferences(preferenceProfile)
+    #values = generatePerferences(preferenceProfile)
     # 格式是{1: [4, 2, 1, 3], 2: [3, 4, 1, 2], 3: [4, 3, 1, 2], 4: [1, 3, 4, 2], 5: [2, 3, 4, 1], 6: [2, 1, 3, 4]}
     # 需要注意value才是选票
-    if agent in values.keys():
-        return values[agent][0]  # 返回第一个
+
+    if agent in preferenceProfile.keys():
+        return preferenceProfile[agent][0]
+    # if agent in values.keys():
+    #     return values[agent][0]  # 返回第一个
 
     return 0
 
 
 # TODO:
 def scoringRule(preferences, scoreVector, tieBreak):
+    print("scoringRule")
+    print(preferences)
+    print(scoreVector)
+    print(tieBreak)
+    print("END scoringRule")
     votesDict = {}
     values = generatePerferences(preferences)
     # 得出values
@@ -41,6 +49,11 @@ def scoringRule(preferences, scoreVector, tieBreak):
 
 
 def plurality(preferences, tieBreak):
+    print("plurality")
+    print(preferences)
+    print(tieBreak)
+    print("END plurality")
+
     # 无论怎么样，要先calculate并汇总所有的投票
     # plurality意思是第一个出现得最多的
     # 传进来的可能就不是排过序的，那就先
@@ -55,14 +68,21 @@ def plurality(preferences, tieBreak):
         # 保证了选择存在dict，可以统计了
         dict[current_row[0]] += 1
 
-    return tieBreakFindValueByDict(dict, tieBreak)
+    return tieBreakFindValueByDict(preferences, dict, tieBreak)
 
 
 def veto(preferences, tieBreak):
-    # 无论怎么样，要先calculate并汇总所有的投票
-    # vento意思大概是 最后一个是0，那么除了最后一个，其他加1
-    # 传进来的可能就不是排过序的，那就先
-    values = generatePerferences(preferences)
+    print("veto")
+    print(preferences)
+    print(tieBreak)
+    print("END veto")
+    # # 无论怎么样，要先calculate并汇总所有的投票
+    # # vento意思大概是 最后一个是0，那么除了最后一个，其他加1
+    # # 传进来的可能就不是排过序的，那就先
+    # values = generatePerferences(preferences)
+
+    #直接preferences可以计算
+    values = preferences
 
     dict = {}
     for current_row in values.values():
@@ -74,11 +94,15 @@ def veto(preferences, tieBreak):
             if i != len(current_row) - 1:  # 最后一个是0，那么除了最后一个，其他加1
                 dict[current_row[i]] += 1
 
-    return tieBreakFindValueByDict(dict, tieBreak)
+    return tieBreakFindValueByDict(preferences, dict, tieBreak)
     # return 0
 
 
 def borda(preferences, tieBreak):
+    print("borda")
+    print(preferences)
+    print(tieBreak)
+    print("END borda")
     # 排序，最后一个0分，第一个m-1分，统计总分
     dict = {}  # 记录每个候选人的分数变化
     for pref in preferences:
@@ -92,37 +116,74 @@ def borda(preferences, tieBreak):
             dict[pref[i]] = dict[pref[i]] + current
 
     # 最终dict就是结果，但不能立刻返回
-    return tieBreakFindValueByDict(dict, tieBreak)
+    return tieBreakFindValueByDict(preferences, dict, tieBreak)
 
     # return 0
 
 
-def tieBreakFindValueByDict(dict, tieBreak):
+def tieBreakFindValueByDict(preferences, dict, tieBreak):
+    print("tieBreakFindValueByDict")
+    print(dict)
     # 简单好懂的做法就是把最大的current_max挑出来
     # 把所有的选择都放进set
-    dataset = set([])
-    current_max = 0
+    dataset = []
+    current_max = max(dict.values())
     for k in dict.keys():
-        current_max = max(current_max, dict[k])
-    for k in dict.keys():
-        if dict[k] >= current_max:
-            dataset.add(k)
-        # 挑出最大值的
-    # 然后set就是最大值的候选，多于一个则是同分
-    # 同分的时候，根据tieBreak选择
-    # 剩下的元素使用tieBreak
+        if current_max == dict[k]:
+            dataset.append({"key":k, "value":dict[k]})
+    print("tieBreakFindValueByDict dataset")
+    print(dataset)
+
+    #     current_max = max(current_max, dict[k])
+    # for k in dict.keys():
+    #     if dict[k] >= current_max:
+    #         dataset.append(k)
+
+    # print("tieBreakFindValueByDict dataset")
+    # print(dataset)
+    # # 然后set就是最大值的候选，多于一个则是同分
+    # # 同分的时候，根据tieBreak选择
+    # # 剩下的元素使用tieBreak
     if tieBreak == 'min':  # 找出最大的同时的最小index
-        return min(dataset)
+        min_index = -1
+        # current_min = 99999999
+        for val in dataset:
+            if min_index < 0:
+                min_index = val['key']
+            elif min_index > val['key']:
+                min_index = val['key']
+        print('min_index')
+        print(min_index)
+        return min_index
+
     if tieBreak == 'max':
-        return max(dataset)
+        max_index = -1
+        # current_max = 0
+        for val in dataset:
+            if max_index < 0:
+                max_index = val['key']
+            elif max_index < val['key']:
+                max_index = val['key']
+        print('max_index')
+        print(max_index)
+        return max_index
+
     # else 取index
-    list = []
-    list.extend(set)
+    # list = []
+    # list = list(set)
+    # list.extend(set) # set 不可以 extend，因为set不能iterate
     rng = int(tieBreak)
-    return list[rng]
+    print("tieBreakFindValueByDict rng")
+    print(rng)
+    print(preferences[rng][0])
+    return preferences[rng][0]
 
 
 def harmonic(preferences, tieBreak):
+    print("harmonic")
+    print(preferences)
+    print(tieBreak)
+    print("END harmonic")
     # 无论怎么样，要先calculate并汇总所有的投票
     # harmonic意思大概是 第一个就是1/1 最后一个1/m
     # 传进来的可能就不是排过序的，那就先
@@ -137,11 +198,15 @@ def harmonic(preferences, tieBreak):
             # 保证了选择存在dict，可以统计了
             dict[current_row[i]] += (1.0 / float(i + 1))
 
-    return tieBreakFindValueByDict(dict, tieBreak)
+    return tieBreakFindValueByDict(preferences, dict, tieBreak)
     #return 0
 
 
 def STV(preferences, tieBreak):
+    print("STV")
+    print(preferences)
+    print(tieBreak)
+    print("END STV")
     # 无论怎么样，要先calculate并汇总所有的投票
     # STV意思好像是一票否决，最后一个留下的就是赢家
     # 传进来的可能就不是排过序的，那就先
@@ -183,6 +248,10 @@ def STV(preferences, tieBreak):
 
 
 def rangeVoting(values, tieBreak):
+    print("rangeVoting")
+    print(values)
+    print(tieBreak)
+    print("END rangeVoting")
     # 这个是最终需要实现的
     # rangeVoting没必要排序，先全部加上
 
@@ -198,7 +267,7 @@ def rangeVoting(values, tieBreak):
             dict[i] = dict[i] + current
 
     # 最终dict就是结果，但不能立刻返回
-    return tieBreakFindValueByDict(dict, tieBreak)
+    return tieBreakFindValueByDict(None, dict, tieBreak)
     # 然后根据tieBreak选出一个
 
     return 0
