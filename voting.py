@@ -264,7 +264,7 @@ def rangeVoting(values, tieBreak):
             if i not in dict.keys():  ##未经记录，设置为0
                 dict[i] = 0
             # 保证了选择存在dict，可以统计了
-            dict[i] = dict[i] + current
+            dict[i] = dict[i]+current
 
     # 最终dict就是结果，但不能立刻返回
     return tieBreakFindValueByDict(None, dict, tieBreak)
