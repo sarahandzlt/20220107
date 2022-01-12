@@ -1,18 +1,32 @@
-def generatePerferences(values):
+def generatePreferences(values):
+    print("generatePreferences")
+    print(values)
     dict = {}
 
-    for i in range(0, len(values)):
-        array = values[i]
+    for i in range(values.max_row):
+        list1 = []
+        for j in range(values.max_column):
+            cell = values.cell(row=i + 1, column=j + 1).value
+            list1.append({'index': j + 1, 'value': cell})
+
+            # sorted_list = [item['index'] for item in list2]
+
+        # for j in range(0, len(array)):
+        #     list2.append({'index': j + 1, 'value': array[j]})
+        list1.sort(key=lambda x: x['value'] + 0.0000001 * x['index'], reverse=True)
+        #一般来说sort都是快速排序，是不稳定的排序。根据测试用例，他要求的是带有顺序的，越往后面，同一个值越大
+        #也就是要求升序排列是稳定的，值 3 = 4 的时候，reverse降序排列才是4 3 1 2
+        #但sort是不稳定的快速排序，所以在这里强行加了一个小数位，根据index的值控制大小，就不用自己实现一个
+        #稳定的排序
         list2 = []
-        for j in range(0, len(array)):
-            list2.append({'index': j + 1, 'value': array[j]})
-        list2.sort(key=lambda x: x['value'], reverse=True)
+        for k in list1:
+            list2.append(k['index'])
+        dict[i + 1] = list2
 
-        sorted_list = [item['index'] for item in list2]
-
-        dict[i + 1] = sorted_list
-
+    print("generatePerference return")
+    print(dict)
     return dict
+
 
 # completed
 def dictatorship(preferenceProfile, agent):
@@ -23,7 +37,7 @@ def dictatorship(preferenceProfile, agent):
 
     # 一个agent 决定一切，他的选择的第一个就是结果
     # 传进来的可能就不是排过序的，那就先
-    #values = generatePerferences(preferenceProfile)
+    # values = generatePerferences(preferenceProfile)
     # 格式是{1: [4, 2, 1, 3], 2: [3, 4, 1, 2], 3: [4, 3, 1, 2], 4: [1, 3, 4, 2], 5: [2, 3, 4, 1], 6: [2, 1, 3, 4]}
     # 需要注意value才是选票
 
@@ -43,7 +57,7 @@ def scoringRule(preferences, scoreVector, tieBreak):
     print(tieBreak)
     print("END scoringRule")
 
-    #找出最大
+    # 找出最大
     vector_max = max(scoreVector)
     list_index = []
     for i in range(len(scoreVector)):
@@ -52,14 +66,14 @@ def scoringRule(preferences, scoreVector, tieBreak):
             list_index.append(i)
 
     if tieBreak == 'min':  # 找出最大的同时的最小index
-        return min(list_index) + 1 #他题目的index从1算起
+        return min(list_index) + 1  # 他题目的index从1算起
 
     if tieBreak == 'max':
-        return min(list_index) + 1 #他题目的index从1算起
+        return min(list_index) + 1  # 他题目的index从1算起
 
     if len(list_index) == 1:
         ## 如果没有tie，就用不着做过多计算
-        return list_index[0] + 1  #他题目的index从1算起
+        return list_index[0] + 1  # 他题目的index从1算起
 
     # else 取index
     # list = []
@@ -97,9 +111,6 @@ def plurality(preferences, tieBreak):
     print("END plurality dictionary")
     print(dict)
 
-    ## debug
-    # if tieBreak == 2:
-    #     return 1 ##debug
     return tieBreakFindValueByDict(preferences, dict, tieBreak)
 
 
@@ -113,7 +124,7 @@ def veto(preferences, tieBreak):
     # # 传进来的可能就不是排过序的，那就先
     # values = generatePerferences(preferences)
 
-    #直接preferences可以计算
+    # 直接preferences可以计算
     values = preferences
 
     dict = {}
@@ -163,12 +174,12 @@ def tieBreakFindValueByDict(preferences, dict, tieBreak):
     current_max = max(dict.values())
     for k in dict.keys():
         if current_max == dict[k]:
-            dataset.append({"key":k, "value":dict[k]})
+            dataset.append({"key": k, "value": dict[k]})
     print("tieBreakFindValueByDict dataset")
     print(dataset)
 
     if len(dataset) == 1:
-        #只剩下一个的时候，直接返回，不用下面的运算
+        # 只剩下一个的时候，直接返回，不用下面的运算
         return dataset[0]['key']
 
     # 如果没有tie，就用不着做过多计算
@@ -177,7 +188,7 @@ def tieBreakFindValueByDict(preferences, dict, tieBreak):
     for k2 in dict.keys():
         if dict[k2] < maxvalue:
             list_to_remove.append(k2)
-            #不能在dict循环的时候进行移除，这样改变了iterator的大小，铁定报错
+            # 不能在dict循环的时候进行移除，这样改变了iterator的大小，铁定报错
 
     for item in list_to_remove:
         if item in dict.keys():
@@ -205,7 +216,6 @@ def tieBreakFindValueByDict(preferences, dict, tieBreak):
     #     ###### 以上。
     #     print("tiebreak 1 return " + str(list_to_remove[0]) + "  ,,  " + dict.keys().__str__())
     #     return list_to_remove[0]
-
 
     #     current_max = max(current_max, dict[k])
     # for k in dict.keys():
@@ -279,7 +289,7 @@ def harmonic(preferences, tieBreak):
             dict[current_row[i]] += (1.0 / float(i + 1))
 
     return tieBreakFindValueByDict(preferences, dict, tieBreak)
-    #return 0
+    # return 0
 
 
 def STV(preferences, tieBreak):
@@ -289,40 +299,44 @@ def STV(preferences, tieBreak):
     print("END STV")
     # 无论怎么样，要先calculate并汇总所有的投票
     # STV意思好像是一票否决，最后一个留下的就是赢家
-    # 传进来的可能就不是排过序的，那就先
-    values = generatePerferences(preferences)
     # 格式是{1: [4, 2, 1, 3], 2: [3, 4, 1, 2], 3: [4, 3, 1, 2], 4: [1, 3, 4, 2], 5: [2, 3, 4, 1], 6: [2, 1, 3, 4]}
     # 需要注意value(冒号右边）才是选票
 
-    key_list = []
-    key_list.extend(values.keys())
-    key_list.sort()
     # 每一次迭代，拿掉最后的那个
-    dataset = set([])
-    # 先把所有元素都加入set
-    for prep in values.values():
-        for p in prep:
-            dataset.add(p)
-    # 迭代所有，去掉最末尾
-    for key in key_list:
-        prep = values[key]
-        if prep in dataset and len(dataset) > 1:
-            dataset.remove(prep[-1])
-        if len(dataset) == 1:
-            return dataset.pop()
+    dict = {}
+    blocked = {}
+    # 先统计
+    # 先把所有元素都作为key加入dictionary
+    for current_row in preferences.values():
+        for i in range(len(current_row)):
+            cell = current_row[i]
+            if i == len(current_row) - 1:
+                blocked[cell] = 1
+                if cell in dict.keys():  ##未经记录，设置为0
+                    dict.pop(cell)
 
-    # 剩下的元素使用tieBreak
-    if tieBreak == 'min':
-        return min(dataset)
+                # 突然死亡制？
+                if len(dict.keys()) == 1:
+                    tmplist = list(dict.keys())
+                    return tmplist[0]
+            else:
+                if cell not in blocked.keys() and cell not in dict.keys():  ##未经记录，设置为0
+                    dict[cell] = 1
+                # 保证了选择存在dict
 
-    if tieBreak == 'max':
-        return max(dataset)
-
-    # else 取index
-    list = []
-    list.extend(set)
-    rng = int(tieBreak)
-    return list[rng]
+    return tieBreakFindValueByDict(preferences, dict, tieBreak)
+    # # 剩下的元素使用tieBreak
+    # if tieBreak == 'min':
+    #     return min(dataset)
+    #
+    # if tieBreak == 'max':
+    #     return max(dataset)
+    #
+    # # else 取index
+    # list = []
+    # list.extend(set)
+    # rng = int(tieBreak)
+    # return list[rng]
 
     # return 0
 
@@ -344,7 +358,7 @@ def rangeVoting(values, tieBreak):
             if i not in dict.keys():  ##未经记录，设置为0
                 dict[i] = 0
             # 保证了选择存在dict，可以统计了
-            dict[i] = dict[i]+current
+            dict[i] = dict[i] + current
 
     # 最终dict就是结果，但不能立刻返回
     return tieBreakFindValueByDict(None, dict, tieBreak)
