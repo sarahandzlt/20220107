@@ -3,9 +3,6 @@
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import TestTask1
-from accounts import BasicAccount
-from accounts import PremiumAccount
-
 
 def main():
     list = TestTask1.generatePerferences([
@@ -28,7 +25,7 @@ def print_hi(name):
 if __name__ == '__main__':
     main()
 
-    # # 写个测试，别无脑进去送死
+
     # teacher = BasicAccount("TEACHER", 500)
     # student = PremiumAccount("STUDENT", 500, 0, 5000)
     #

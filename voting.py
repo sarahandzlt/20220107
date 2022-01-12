@@ -35,17 +35,41 @@ def dictatorship(preferenceProfile, agent):
     return 0
 
 
-# TODO:
 def scoringRule(preferences, scoreVector, tieBreak):
+    ## 看起来像是返回index，但不是很好确定，多测试几遍
     print("scoringRule")
     print(preferences)
     print(scoreVector)
     print(tieBreak)
     print("END scoringRule")
-    votesDict = {}
-    values = generatePerferences(preferences)
-    # 得出values
-    return 0
+
+    #找出最大
+    vector_max = max(scoreVector)
+    list_index = []
+    for i in range(len(scoreVector)):
+        # for val in dataset:
+        if scoreVector[i] >= vector_max:
+            list_index.append(i)
+
+    if tieBreak == 'min':  # 找出最大的同时的最小index
+        return min(list_index) + 1 #他题目的index从1算起
+
+    if tieBreak == 'max':
+        return min(list_index) + 1 #他题目的index从1算起
+
+    if len(list_index) == 1:
+        ## 如果没有tie，就用不着做过多计算
+        return list_index[0] + 1  #他题目的index从1算起
+
+    # else 取index
+    # list = []
+    # list = list(set)
+    # list.extend(set) # set 不可以 extend，因为set不能iterate
+    rng = int(tieBreak)
+    print("tieBreakFindValueByDict rng")
+    print(rng)
+    print(preferences[rng][0])
+    return preferences[rng][0]
 
 
 def plurality(preferences, tieBreak):
@@ -55,19 +79,27 @@ def plurality(preferences, tieBreak):
     print("END plurality")
 
     # 无论怎么样，要先calculate并汇总所有的投票
-    # plurality意思是第一个出现得最多的
+    # plurality意思是第一个出现得最多的 -- important
     # 传进来的可能就不是排过序的，那就先
-    values = generatePerferences(preferences)
+    # values = generatePerferences(preferences)
     # 格式是{1: [4, 2, 1, 3], 2: [3, 4, 1, 2], 3: [4, 3, 1, 2], 4: [1, 3, 4, 2], 5: [2, 3, 4, 1], 6: [2, 1, 3, 4]}
     # 需要注意value(冒号右边）才是选票
     # 记录第一个出现的次数
     dict = {}
-    for current_row in values.values():
+    for current_row in preferences.values():
         if current_row[0] not in dict.keys():  ##未经记录，设置为0
             dict[current_row[0]] = 0
+
         # 保证了选择存在dict，可以统计了
         dict[current_row[0]] += 1
+    print("plurality dictionary")
+    print(dict)
+    print("END plurality dictionary")
+    print(dict)
 
+    ## debug
+    # if tieBreak == 2:
+    #     return 1 ##debug
     return tieBreakFindValueByDict(preferences, dict, tieBreak)
 
 
@@ -104,16 +136,17 @@ def borda(preferences, tieBreak):
     print(tieBreak)
     print("END borda")
     # 排序，最后一个0分，第一个m-1分，统计总分
-    dict = {}  # 记录每个候选人的分数变化
-    for pref in preferences:
-        leng = len(pref)
+    values = preferences
+    dict = {}
+    for current_row in values.values():
+        leng = len(current_row)
         for i in range(0, leng):
             current = leng - i - 1  # 当前分数。当前的选择是pref[i]
             # 更新dictionary
-            if pref[i] not in dict.keys():  ##未经记录，设置为0
-                dict[pref[i]] = 0
+            if current_row[i] not in dict.keys():  ##未经记录，设置为0
+                dict[current_row[i]] = 0
             # 保证了选择存在dict，可以统计了
-            dict[pref[i]] = dict[pref[i]] + current
+            dict[current_row[i]] = dict[current_row[i]] + current
 
     # 最终dict就是结果，但不能立刻返回
     return tieBreakFindValueByDict(preferences, dict, tieBreak)
@@ -133,6 +166,46 @@ def tieBreakFindValueByDict(preferences, dict, tieBreak):
             dataset.append({"key":k, "value":dict[k]})
     print("tieBreakFindValueByDict dataset")
     print(dataset)
+
+    if len(dataset) == 1:
+        #只剩下一个的时候，直接返回，不用下面的运算
+        return dataset[0]['key']
+
+    # 如果没有tie，就用不着做过多计算
+    maxvalue = max(dict.values())
+    list_to_remove = []
+    for k2 in dict.keys():
+        if dict[k2] < maxvalue:
+            list_to_remove.append(k2)
+            #不能在dict循环的时候进行移除，这样改变了iterator的大小，铁定报错
+
+    for item in list_to_remove:
+        if item in dict.keys():
+            dict.pop(item)
+
+    # if len(dict.keys()) == 1:
+    #     #只剩下一个的时候，直接返回，不用下面的运算
+    #     list_to_remove.clear()
+    #     list_to_remove.extend(dict.keys())
+    #     #这里这么写，是非常个人风格的
+    #     #list_to_remove是个列表，有学过数据结构应该知道，要么是数组要么是链表，但反正已经是分配过内存空间的
+    #     #clear是清空列表原有的数据，但我并没有创建一个新的列表变量，所以实际上只分配了一次内存空间
+    #     #后面再用同一个列表，把dict的key加进去，就省一次内存分配。但在python里面这些都看不到，或者做Python数据有关工作的人不会关心
+    #     #不够内存反正加就是了
+    #
+    #     #dict.keys也能够取第一个返回，例如
+    #     # for key3 in dict.keys():
+    #     #     return key3
+    #     #或者其他返回首个（唯一一个）元素的方法。我用list，只是个人习惯，或者我很喜欢用编辑器的.打开智能感应
+    #     #很多写法是基于这个的
+    #     ###### 一旦有人用了这一段
+    #     ###### list_to_remove.clear()
+    #     ###### list_to_remove.extend(dict.keys())
+    #     ###### 十有八九这家伙抄你
+    #     ###### 以上。
+    #     print("tiebreak 1 return " + str(list_to_remove[0]) + "  ,,  " + dict.keys().__str__())
+    #     return list_to_remove[0]
+
 
     #     current_max = max(current_max, dict[k])
     # for k in dict.keys():
@@ -173,10 +246,17 @@ def tieBreakFindValueByDict(preferences, dict, tieBreak):
     # list = list(set)
     # list.extend(set) # set 不可以 extend，因为set不能iterate
     rng = int(tieBreak)
-    print("tieBreakFindValueByDict rng")
-    print(rng)
-    print(preferences[rng][0])
-    return preferences[rng][0]
+    print("tieBreakFindValueByDict rng two " + str(rng))
+    print(preferences[rng])
+    print(dict)
+
+    for prep in preferences[rng]:
+        if prep in dict.keys():
+            print("tieBreakFindValueByDict rng two return " + str(prep))
+            return prep
+
+    print("tieBreakFindValueByDict rng two return -1")
+    return -1
 
 
 def harmonic(preferences, tieBreak):

@@ -1,20 +1,46 @@
+# 写个测试程序
+from voting import harmonic, scoringRule, plurality
 
 
-def generatePerferences(array2d):
+def main():
+# {1: [1, 2, 3, 4, 5, 6],
+#2: [4, 5, 1, 3, 2, 6],
+#3: [6, 1, 2, 3, 4, 5],
+#4: [5, 3, 2, 1, 4, 6],
+#5: [1, 3, 2, 4, 5, 6],
+#6: [3, 2, 4, 6, 5, 1],
+#7: [3, 1, 4, 5, 6, 2],
+#8: [1, 3, 2, 5, 6, 4],
+#9: [1, 6, 4, 5, 3, 2],
+#10: [6, 3, 2, 4, 5, 1]}
+    #6
     dict = {}
+    dict[1] = [1, 2, 3, 4, 5, 6]
+    dict[2] = [4, 5, 1, 3, 2, 6]
+    dict[3] = [6, 1, 2, 3, 4, 5]
+    dict[4] = [5, 3, 2, 1, 4, 6]
+    dict[5] = [1, 3, 2, 4, 5, 6]
+    dict[6] = [3, 2, 4, 6, 5, 1]
+    dict[7] = [3, 1, 4, 5, 6, 2]
+    dict[8] = [1, 3, 2, 5, 6, 4]
+    dict[9] = [1, 6, 4, 5, 3, 2]
+    dict[10] = [6, 3, 2, 4, 5, 1]
 
-    for i in range(0, len(array2d)):
-        array = array2d[i]
-        list2 = []
-        for j in range(0, len(array)):
-            list2.append({'index': j + 1, 'value': array[j]})
-        list2.sort(key=lambda x: x['value'], reverse=True)
+    # 还是一样，有入参出参就可以做个测试方法
+    #harmonic(dict, 6)
+    #{1: [1, 2, 3, 4, 5, 6], 2: [4, 5, 1, 3, 2, 6], 3: [6, 1, 2, 3, 4, 5], 4: [5, 3, 2, 1, 4, 6], 5: [1, 3, 2, 4, 5, 6],
+    # 6: [3, 2, 4, 6, 5, 1], 7: [3, 1, 4, 5, 6, 2], 8: [1, 3, 2, 5, 6, 4], 9: [1, 6, 4, 5, 3, 2], 10: [6, 3, 2, 4, 5, 1]}
+   #borda(dict, 'max')
+    dict = {1: [1, 2, 3, 4, 5, 6], 2: [4, 5, 1, 3, 2, 6], 3: [3, 1, 2, 6, 4, 5], 4: [5, 3, 2, 1, 4, 6],
+            5: [1, 3, 2, 4, 5, 6], 6: [3, 2, 4, 6, 5, 1], 7: [3, 1, 4, 5, 6, 2], 8: [1, 3, 2, 5, 6, 4],
+            9: [2, 6, 4, 5, 3, 1], 10: [6, 3, 2, 4, 5, 1]}
+    varresult = plurality(dict, 2)
+    print("varresult::  " + str(varresult))
 
-        sorted_list = [item['index'] for item in list2]
+    #scoringRule(None, [10,2,2,2,2,2], 4)
 
-        dict[i + 1] = sorted_list
-
-    return dict
-
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    main()
 
 
