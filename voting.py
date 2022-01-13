@@ -277,7 +277,7 @@ def harmonic(preferences, tieBreak):
     # 无论怎么样，要先calculate并汇总所有的投票
     # harmonic意思大概是 第一个就是1/1 最后一个1/m
     # 传进来的可能就不是排过序的，那就先
-    values = generatePerferences(preferences)
+    values = preferences # generatePerferences(preferences)
 
     dict = {}
     for current_row in values.values():
@@ -343,23 +343,37 @@ def STV(preferences, tieBreak):
 
 def rangeVoting(values, tieBreak):
     print("rangeVoting")
-    print(values)
+    print((values.max_row, values.max_column))
     print(tieBreak)
     print("END rangeVoting")
     # 这个是最终需要实现的
     # rangeVoting没必要排序，先全部加上
 
+    dict1 = {}  # 原始数据
+    for i in range(values.max_row):
+        list1 = []
+        for j in range(values.max_column):
+            cell = values.cell(row=i + 1, column=j + 1).value
+            #list1.append({'index': j + 1, 'value': cell})
+            list1.append(cell)
+        dict1[i] = list1
+        print(list1)
+        print("END rangeVoting list1")
+
     dict = {}  # 记录每个候选人的分数变化
-    for prop in values:
+
+    for prop in dict1.values():
         leng = len(prop)
         for i in range(0, leng):
             current = prop[i]  # 当前分数。当前的选择是 i
             # 更新dictionary
-            if i not in dict.keys():  ##未经记录，设置为0
-                dict[i] = 0
+            if i + 1 not in dict.keys():  ##未经记录，设置为0
+                dict[i + 1] = 0
             # 保证了选择存在dict，可以统计了
-            dict[i] = dict[i] + current
+            dict[i + 1] = dict[i + 1] + current
 
+    print(dict)
+    print("END rangeVoting dict")
     # 最终dict就是结果，但不能立刻返回
     return tieBreakFindValueByDict(None, dict, tieBreak)
     # 然后根据tieBreak选出一个
