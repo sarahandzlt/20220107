@@ -298,33 +298,55 @@ def STV(preferences, tieBreak):
     print(tieBreak)
     print("END STV")
     # 无论怎么样，要先calculate并汇总所有的投票
-    # STV意思好像是一票否决，最后一个留下的就是赢家
+    # STV意思好像是每一轮淘汰掉最少人选择为第一个的，最后一个留下的就是赢家
     # 格式是{1: [4, 2, 1, 3], 2: [3, 4, 1, 2], 3: [4, 3, 1, 2], 4: [1, 3, 4, 2], 5: [2, 3, 4, 1], 6: [2, 1, 3, 4]}
     # 需要注意value(冒号右边）才是选票
 
-    # 每一次迭代，拿掉最后的那个
-    dict = {}
+    list0 = []
+    for val in preferences.values():
+        list0.append(val)
+
+    # 每一次迭代，拿掉最少人选为第一选择的那个
+    dict0 = {}
+    dict1 = {}
     blocked = {}
     # 先统计
     # 先把所有元素都作为key加入dictionary
-    for current_row in preferences.values():
+    for current_row in list0:
         for i in range(len(current_row)):
             cell = current_row[i]
-            if i == len(current_row) - 1:
-                blocked[cell] = 1
-                if cell in dict.keys():  ##未经记录，设置为0
-                    dict.pop(cell)
+            if cell not in dict0.keys():
+                dict0[cell] = 0
+            dict0[cell] = dict0[cell] + 1
+            if cell not in dict1.keys():
+                dict1[cell] = 0
+            if i == 0:
+                dict1[cell] = dict1[cell] + 1
+                # 只记录第一个选择的多少
 
-                # 突然死亡制？
-                if len(dict.keys()) == 1:
-                    tmplist = list(dict.keys())
-                    return tmplist[0]
-            else:
-                if cell not in blocked.keys() and cell not in dict.keys():  ##未经记录，设置为0
-                    dict[cell] = 1
-                # 保证了选择存在dict
+    print(dict1)
+    print("STV dict1")
 
-    return tieBreakFindValueByDict(preferences, dict, tieBreak)
+    for k2 in range(len(dict1.keys())):
+        min_val = 99999999
+        max_val = -1
+        for k in dict1.keys():
+            min_val = min(min_val, dict1[k])
+            max_val = max(max_val, dict1[k])
+        if min_val == max_val :
+            break
+        for k in dict1.keys():
+            if min_val == dict1[k]:
+                blocked[k] = k
+        for bk in blocked.keys():
+            if bk in dict1.keys():
+                dict1.pop(bk)
+            if bk in dict0.keys():
+                dict0.pop(bk)
+
+    print(blocked)
+    print("STV blocks")
+    return tieBreakFindValueByDict(preferences, dict0, tieBreak)
     # # 剩下的元素使用tieBreak
     # if tieBreak == 'min':
     #     return min(dataset)

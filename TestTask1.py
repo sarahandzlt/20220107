@@ -5,10 +5,10 @@ import openpyxl
 
 def main():
     #test openpyxl
-    path = "voting.xlsx"
-    wb_obj = openpyxl.load_workbook(path)
-    sheet_obj = wb_obj.active
-    varexcel = generatePreferences(sheet_obj)
+    # path = "voting.xlsx"
+    # wb_obj = openpyxl.load_workbook(path)
+    # sheet_obj = wb_obj.active
+    # varexcel = generatePreferences(sheet_obj)
 # {1: [1, 2, 3, 4, 5, 6],
 #2: [4, 5, 1, 3, 2, 6],
 #3: [6, 1, 2, 3, 4, 5],
